@@ -152,4 +152,10 @@ export default class DocCollection<Schema extends BaseDoc> {
     await this.deleteOne({ _id: one._id } as Filter<Schema>);
     return one;
   }
+
+  async setExpiration(name: string) {
+    if (name === "stats") {
+      await this.collection.createIndex({ dateCreated: 1 }, { expireAfterSeconds: 31536000 });
+    }
+  }
 }

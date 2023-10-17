@@ -27,6 +27,12 @@ async function register() {
         <label for="aligned-password">Password</label>
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
+
+      <div class="pure-control-group">
+        <label for="genderPref">Gender Preference</label>
+        <input type="text" v-model.trim="genderPref" id="genderPref" placeholder="Gender Preference" required />
+      </div>
+
       <div class="pure-controls">
         <button type="submit" class="pure-button pure-button-primary">Register</button>
       </div>
