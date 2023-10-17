@@ -5,11 +5,11 @@ import { ref } from "vue";
 
 const username = ref("");
 const password = ref("");
-const genderPref = ref("");
+const genderPref = ref([""]);
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
-  await createUser(username.value, password.value, genderPref.value);
+  await createUser(username.value, password.value, genderPrefs);
   await loginUser(username.value, password.value);
   void updateSession();
   void router.push({ name: "Home" });
@@ -31,7 +31,14 @@ async function register() {
 
       <div class="pure-control-group">
         <label for="genderPref">Gender Preference</label>
-        <input type="text" v-model.trim="genderPref" id="genderPref" placeholder="Gender Preference" required />
+        <input type="checkbox" value="male" v-model="genderPrefs" id="genderPrefMale" />
+        <label for="genderPrefMale">Male</label>
+
+        <input type="checkbox" value="female" v-model="genderPrefs" id="genderPrefFemale" />
+        <label for="genderPrefFemale">Female</label>
+
+        <input type="checkbox" value="other" v-model="genderPrefs" id="genderPrefOther" />
+        <label for="genderPrefOther">Other</label>
       </div>
 
       <div class="pure-controls">
