@@ -14,9 +14,20 @@ export const useUserStore = defineStore(
       currentUsername.value = "";
     };
 
-    const createUser = async (username: string, password: string, genderPref: Array<string>) => {
+    const createUser = async (
+      username: string,
+      password: string,
+      genderPref: Array<string>,
+      gender: string,
+      sportsPref: Array<string>,
+      sports: Array<string>,
+      skill: number,
+      skillPrefRange: Array<number>,
+      location: string,
+      maxLocationDistance: number,
+    ) => {
       await fetchy("/api/users", "POST", {
-        body: { username, password, genderPref },
+        body: { username, password, genderPref, gender, sportsPref, sports, skill, skillPrefRange, location, maxLocationDistance },
       });
     };
 

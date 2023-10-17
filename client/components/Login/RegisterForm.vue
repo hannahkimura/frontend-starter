@@ -6,10 +6,19 @@ import { ref } from "vue";
 const username = ref("");
 const password = ref("");
 const genderPref = ref([""]);
+const sportsPref = ref([""]);
+const sports = ref([""]);
+const gender = ref("");
+const minSkillPref = ref(0);
+const maxSkillPref = ref(5);
+const skill = ref(0); //skill score starts at 0
+const location = ref("");
+const maxLocationDistance = ref(1000); //max number of miles willing to travel
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
-  await createUser(username.value, password.value, genderPrefs);
+  const skillPrefRange = [minSkillPref, maxSkillPref]; //store the range
+  await createUser(username.value, password.value, genderPref, gender.value, sportsPref, sports, skill, skillPrefRange, location.value, maxLocationDistance);
   await loginUser(username.value, password.value);
   void updateSession();
   void router.push({ name: "Home" });
@@ -39,6 +48,68 @@ async function register() {
 
         <input type="checkbox" value="other" v-model="genderPrefs" id="genderPrefOther" />
         <label for="genderPrefOther">Other</label>
+      </div>
+
+      <div class="pure-control-group">
+        <label for="genderPref">Gender Preference</label>
+        <div>
+          <input type="radio" value="male" v-model="selectedGender" id="genderPrefMale" />
+          <label for="genderPrefMale">Male</label>
+        </div>
+        <div>
+          <input type="radio" value="female" v-model="selectedGender" id="genderPrefFemale" />
+          <label for="genderPrefFemale">Female</label>
+        </div>
+
+        <div class="pure-control-group">
+          <label for="location">Current location</label>
+          <input type="text" id="location" v-model.trim="location" placeholder="Current Location" required />
+        </div>
+
+        <div>
+          <input type="radio" value="other" v-model="selectedGender" id="genderPrefOther" />
+          <label for="genderPrefOther">Other</label>
+        </div>
+      </div>
+
+      <div class="pure-control-group">
+        <label for="skill">Skill Level (0 to 5)</label>
+        <input type="number" id="skill" v-model="skillLevel" min="0" max="5" required />
+      </div>
+
+      <div class="pure-control-group">
+        <label for="maxLocationDistance">Max Location Distance (in miles)</label>
+        <input type="number" id="maxLocationDistance" v-model="maxDistance" min="0" required />
+      </div>
+
+      <div class="pure-control-group">
+        <label for="sportsPref">Sports Preferences</label>
+        <div>
+          <input type="checkbox" value="basketball" v-model="sportsPrefs" id="sportsPrefBasketball" />
+          <label for="sportsPrefBasketball">Basketball</label>
+        </div>
+        <div>
+          <input type="checkbox" value="tennis" v-model="sportsPrefs" id="sportsPrefTennis" />
+          <label for="sportsPrefTennis">Tennis</label>
+        </div>
+        <div>
+          <input type="checkbox" value="volleyball" v-model="sportsPrefs" id="sportsPrefVolleyball" />
+          <label for="sportsPrefVolleyball">Volleyball</label>
+        </div>
+        <div>
+          <input type="checkbox" value="running" v-model="sportsPrefs" id="sportsPrefRunning" />
+          <label for="sportsPrefRunning">Running</label>
+        </div>
+      </div>
+
+      <div class="pure-control-group">
+        <label for="skillPrefMin">Minimum Skill Level (0 to 5)</label>
+        <input type="number" id="skillPrefMin" v-model="minSkillPref" min="0" max="5" required />
+      </div>
+
+      <div class="pure-control-group">
+        <label for="skillPrefMax">Maximum Skill Level (0 to 5)</label>
+        <input type="number" id="skillPrefMax" v-model="maxSkillPref" min="0" max="5" required />
       </div>
 
       <div class="pure-controls">

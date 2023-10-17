@@ -45,7 +45,6 @@ export default class UserConcept {
     const _id = await this.users.createOne({ username, password });
     const _pref = await this.userPreferences.createOne({ username, genderPref, sportsPref, skillPref, locationRange });
     const _prof = await this.userProfiles.createOne({ username, gender, sports, skill, location });
-    console.log("HI", _prof);
     return {
       msg: "User created successfully!",
       user: await this.users.readOne({ _id }),
