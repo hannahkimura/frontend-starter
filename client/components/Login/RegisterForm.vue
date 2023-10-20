@@ -18,7 +18,7 @@ const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
   const skillPrefRange = [minSkillPref, maxSkillPref]; //store the range
-  await createUser(username.value, password.value, genderPref, gender.value, sportsPref, sports, skill, skillPrefRange, location.value, maxLocationDistance);
+  await createUser(username.value, password.value, genderPref.value, gender.value, sportsPref.value, sports.value, skill.value, skillPrefRange.value, location.value, maxLocationDistance.value);
   await loginUser(username.value, password.value);
   void updateSession();
   void router.push({ name: "Home" });
