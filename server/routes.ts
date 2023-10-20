@@ -108,8 +108,11 @@ class Routes {
       if (!otherUser) {
         throw new Error("can't find other user");
       }
+      console.log(otherUser, "here");
       const otherId = (await User.getUserByUsername(otherUser))._id;
+      console.log("otherId", otherId);
       const areNotFriends = Friend.isNotFriends(id, otherId);
+      console.log("here", areNotFriends);
 
       if (id.toString() === otherId.toString()) {
         //author is the same as user
@@ -134,14 +137,18 @@ class Routes {
     } else {
       //author doesn't exist
       posts = await Post.getPosts({});
+      return posts;
+      // console.log(posts);
+      // console.log(await Responses.posts(postsToReturn));
     }
-
-    return Responses.posts(postsToReturn);
+    return await Responses.posts(postsToReturn);
   }
 
   @Router.post("/posts")
   async createPost(session: WebSessionDoc, content: string, image?: string, options?: PostOptions, collaborator?: string) {
     const user = WebSession.getUser(session);
+    // const usernameAuthor = await User.idsToUsernames([user]);
+    // console.log("USERNAME IS", usernameAuthor);
     const created = await Post.create(user, content, image, options, collaborator);
     if (!created.post) {
       throw new Error("post wasn't created");
