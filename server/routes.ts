@@ -147,7 +147,6 @@ class Routes {
   @Router.post("/posts")
   async createPost(session: WebSessionDoc, content: string, image?: string, options?: PostOptions, collaborator?: string) {
     const user = WebSession.getUser(session);
-    // const usernameAuthor = await User.idsToUsernames([user]);
     // console.log("USERNAME IS", usernameAuthor);
     const created = await Post.create(user, content, image, options, collaborator);
     if (!created.post) {
@@ -198,6 +197,7 @@ class Routes {
   @Router.delete("/posts/:_id")
   async deletePost(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+    console.log(user, _id);
     await Post.isAuthor(user, _id);
     return Post.delete(_id);
   }

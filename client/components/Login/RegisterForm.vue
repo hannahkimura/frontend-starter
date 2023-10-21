@@ -39,33 +39,37 @@ async function register() {
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
 
-      <div class="pure-control-group">
+      <div class="pure-control-group" id="GenderPref">
         <label for="genderPref">Gender Preference</label>
-        <div>
-          <input type="checkbox" value="male" v-model="genderPref" id="genderPrefMale" />
-          <label for="genderPrefMale">Male</label>
-        </div>
+        <div class="checkbox-container">
+          <div>
+            <input type="checkbox" value="male" v-model="genderPref" id="genderPrefMale" />
+            <label for="genderPrefMale">Male</label>
+          </div>
 
-        <div>
-          <input type="checkbox" value="female" v-model="genderPref" id="genderPrefFemale" />
-          <label for="genderPrefFemale">Female</label>
-        </div>
+          <div>
+            <input type="checkbox" value="female" v-model="genderPref" id="genderPrefFemale" />
+            <label for="genderPrefFemale">Female</label>
+          </div>
 
-        <div>
-          <input type="checkbox" value="other" v-model="genderPref" id="genderPrefOther" />
-          <label for="genderPrefOther">Other</label>
+          <div>
+            <input type="checkbox" value="other" v-model="genderPref" id="genderPrefOther" />
+            <label for="genderPrefOther">Other</label>
+          </div>
         </div>
       </div>
 
       <div class="pure-control-group">
         <label for="gender">Gender</label>
-        <div>
-          <input type="radio" value="male" v-model="gender" id="genderPrefMale" />
-          <label for="genderPrefMale">Male</label>
-        </div>
-        <div>
-          <input type="radio" value="female" v-model="gender" id="genderPrefFemale" />
-          <label for="genderPrefFemale">Female</label>
+        <div class="radio-container">
+          <div>
+            <input type="radio" value="male" v-model="gender" id="genderPrefMale" />
+            <label for="genderPrefMale">Male</label>
+          </div>
+          <div>
+            <input type="radio" value="female" v-model="gender" id="genderPrefFemale" />
+            <label for="genderPrefFemale">Female</label>
+          </div>
         </div>
       </div>
 
@@ -86,21 +90,23 @@ async function register() {
 
       <div class="pure-control-group">
         <label for="sportsPref">Sports Preferences</label>
-        <div>
-          <input type="checkbox" value="basketball" v-model="sportsPref" id="sportsPrefBasketball" />
-          <label for="sportsPrefBasketball">Basketball</label>
-        </div>
-        <div>
-          <input type="checkbox" value="tennis" v-model="sportsPref" id="sportsPrefTennis" />
-          <label for="sportsPrefTennis">Tennis</label>
-        </div>
-        <div>
-          <input type="checkbox" value="volleyball" v-model="sportsPref" id="sportsPrefVolleyball" />
-          <label for="sportsPrefVolleyball">Volleyball</label>
-        </div>
-        <div>
-          <input type="checkbox" value="running" v-model="sportsPref" id="sportsPrefRunning" />
-          <label for="sportsPrefRunning">Running</label>
+        <div class="checkbox-container">
+          <div>
+            <input type="checkbox" value="basketball" v-model="sportsPref" id="sportsPrefBasketball" />
+            <label for="sportsPrefBasketball">Basketball</label>
+          </div>
+          <div>
+            <input type="checkbox" value="tennis" v-model="sportsPref" id="sportsPrefTennis" />
+            <label for="sportsPrefTennis">Tennis</label>
+          </div>
+          <div>
+            <input type="checkbox" value="volleyball" v-model="sportsPref" id="sportsPrefVolleyball" />
+            <label for="sportsPrefVolleyball">Volleyball</label>
+          </div>
+          <div>
+            <input type="checkbox" value="running" v-model="sportsPref" id="sportsPrefRunning" />
+            <label for="sportsPrefRunning">Running</label>
+          </div>
         </div>
       </div>
 
@@ -123,6 +129,12 @@ async function register() {
 
 <style scoped>
 h3 {
+  display: flex;
+  justify-content: center;
+}
+
+.checkbox-container,
+.radio-container {
   display: flex;
   justify-content: center;
 }
