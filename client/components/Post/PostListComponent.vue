@@ -124,6 +124,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+@import "@/assets/font.css";
 section {
   display: flex;
   flex-direction: column;
@@ -159,7 +160,7 @@ article {
   max-width: 60em;
   font-family: "VTF Redzone Classic "; /* Use the font-family you defined in the CSS. */
 }
-@import "@/assets/font.css";
+
 .custom-font {
   font-family: "VTF Redzone Classic "; /* Use the font-family you defined in the CSS. */
 }

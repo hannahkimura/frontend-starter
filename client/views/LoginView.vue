@@ -10,3 +10,12 @@ import { RouterLink } from "vue-router";
     <p>Still need to create an account? <RouterLink :to="{ name: 'Register' }">Register here</RouterLink></p>
   </main>
 </template>
+
+<style scoped>
+@import "@/assets/font.css";
+
+.column,
+h1 {
+  font-family: "VTF Redzone Classic Oblique";
+}
+</style>
