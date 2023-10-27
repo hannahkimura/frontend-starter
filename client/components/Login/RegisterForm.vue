@@ -15,7 +15,7 @@ const maxSkillPref = ref(5);
 const skill = ref(0); //skill score starts at 0
 const location = ref("");
 const phoneNum = ref("");
-const maxLocationDistance = ref(1000); //max number of miles willing to travel
+const maxLocationDistance = ref(1000); //max number of miles willing to meet another person
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
