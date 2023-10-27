@@ -32,19 +32,19 @@ class Routes {
     username: string,
     password: string,
     gender: string,
-    sports: Map<string, boolean>,
+    sports: Array<string>,
     skill: number,
     location: string,
     genderPref: string,
-    sportsPref: Map<string, boolean>,
+    sportsPref: Array<string>,
     skillPref: Array<number>,
     locationRange: number,
+    goal: string,
   ) {
     WebSession.isLoggedOut(session);
-    const finished = await User.create(username, password, gender, sports, skill, location, genderPref, sportsPref, skillPref, locationRange);
+    const finished = await User.create(username, password, gender, sports, skill, location, genderPref, sportsPref, skillPref, locationRange, goal);
     const userId = finished.user?._id;
     if (userId) {
-      console.log("here");
       await SkillScore.createScore(userId, 1);
     }
     console.log("FINISHED", finished, finished.profile);
@@ -74,19 +74,65 @@ class Routes {
   @Router.post("/users/:_id")
   async getUsersThatMatchPref(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    const userPref = User.getUserPreferencesByUsername(user);
+    const username = await User.idsToUsernames([user]);
+    const newUsername: string = username[0];
 
-    const genderPref = (await userPref).genderPref;
-    const skillPref = (await userPref).skillPref;
-    //const locationRange = (await userPref).locationRange;
-    const sportPref = (await userPref).sportsPref;
+    const userPref = await User.getUserPreferencesByUsername(newUsername);
 
-    return { msg: "Filtered Users!", users: await User.filterUsers({ genderPref, skillPref, sportPref }) };
+    const genderPref = userPref.genderPref;
+    console.log(genderPref);
+    const skillPref = userPref.skillPref;
+    //const locationRange = userPref.locationRange;
+    const sportPref = userPref.sportsPref;
+    console.log("OTHER USERS", await User.filterUsers({ genderPref, skillPref, sportPref }));
+
+    //loop thru users that match gender and then look if their sports have ur sports pref
+    //const valid_users = [];
+    //filter genderPref
+    //for sports I want it to be like if there are multiple sports,
+    //a user having any of those sports would match
+    // I want to filter for sports but I don't know how because it is an array (also skillPref)
+    //return { msg: "Filtered Users!", users: await User.filterUsers({ genderPref, skillPref, sportPref }) };
+    console.log("ACTUAL", await User.filterUsers({ gender: genderPref }));
+    let matches = await User.filterUsers({ gender: genderPref });
+
+    // matches.filter(function (user) {
+    //   console.log(user.username, newUsername);
+    //   if (user.username !== newUsername) {
+    //     console.log("HERE", user.username, newUsername);
+    //     return user;
+    //   }
+    // });
+    matches = matches.filter((userTest) => userTest.username !== newUsername);
+
+    for (const possibleMatch of matches) {
+      let sportsMatch = false;
+      let skillMatch = false;
+      for (const sport of sportPref) {
+        if (possibleMatch.sports.includes(sport)) {
+          sportsMatch = true;
+          break;
+        }
+      }
+      for (let i = skillPref[0]; i < skillPref[1] + 1; i++) {
+        if (i === possibleMatch.skill) {
+          skillMatch = true;
+        }
+      }
+      if (!sportsMatch || !skillMatch) {
+        //get rid of this user
+        matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+      }
+    }
+    console.log("MATCHES", matches);
+
+    return { msg: "Filtered Users!", users: matches };
   }
 
   @Router.post("/login")
   async logIn(session: WebSessionDoc, username: string, password: string) {
     const u = await User.authenticate(username, password);
+
     WebSession.start(session, u._id);
     return { msg: "Logged in!" };
   }
@@ -98,26 +144,27 @@ class Routes {
   }
 
   @Router.get("/posts")
-  async getPosts(session: WebSessionDoc, author?: string) {
+  async gets(session: WebSessionDoc, author?: string) {
     let posts;
     const postsToReturn: Array<PostDoc> = [];
     if (author) {
       const id = (await User.getUserByUsername(author))._id;
+      console.log("ID from getpost", id);
       posts = await Post.getByAuthor(id);
-      const otherUser = session.user;
+      console.log("Post", posts);
+      const otherUser = WebSession.getUser(session);
       if (!otherUser) {
         throw new Error("can't find other user");
       }
       console.log(otherUser, "here");
-      const otherId = (await User.getUserByUsername(otherUser))._id;
+
+      const otherId = (await User.getUserById(otherUser))._id;
       console.log("otherId", otherId);
-      const areNotFriends = Friend.isNotFriends(id, otherId);
-      console.log("here", areNotFriends);
 
       if (id.toString() === otherId.toString()) {
         //author is the same as user
         return Responses.posts(posts);
-      } else if (!areNotFriends) {
+      } else if (await Friend.areFriends(otherId, id)) {
         //this is the case where they are friends
         //show all posts with state of friends
         for (const post of posts) {
@@ -137,32 +184,34 @@ class Routes {
     } else {
       //author doesn't exist
       posts = await Post.getPosts({});
-      return posts;
+      return Responses.posts(posts);
       // console.log(posts);
       // console.log(await Responses.posts(postsToReturn));
     }
+    const result = await Responses.posts(postsToReturn);
+    console.log("RESULT", result);
     return await Responses.posts(postsToReturn);
   }
 
   @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, image?: string, options?: PostOptions, collaborator?: string) {
+  async createPost(session: WebSessionDoc, result: string, content: string, image?: string, options?: PostOptions, collaborator?: string, visibility?: string) {
     const user = WebSession.getUser(session);
-    // console.log("USERNAME IS", usernameAuthor);
-    const created = await Post.create(user, content, image, options, collaborator);
+
+    const created = await Post.create(result, user, content, image, options, collaborator, visibility);
     if (!created.post) {
       throw new Error("post wasn't created");
     }
 
     //NOTE: when stat is added, expiration is set for that stat
     let won = false;
-    if (content === "win") {
+    if (result === "win") {
       won = true;
     }
     if (collaborator) {
       const updatedCollaborator = await User.getUserByUsername(collaborator);
-      const _stat = await SkillScore.createStat(user, content, updatedCollaborator._id); //set expiration for stat
+      const _stat = await SkillScore.createStat(user, result, updatedCollaborator._id); //set expiration for stat
       const new_score = await SkillScore.updateScore(user, won, updatedCollaborator._id);
-
+      console.log("CREATED POST", await Responses.post(created.post));
       return { msg: created.msg, post: await Responses.post(created.post), stat: _stat, UserScore: new_score };
     }
   }
@@ -176,10 +225,10 @@ class Routes {
     await Post.update(_id, update);
     const updatedPost = await Post.getPostById(_id);
 
-    if (originalPost?.content !== updatedPost?.content) {
+    if (originalPost?.result !== updatedPost?.result) {
       const opponent = updatedPost?.collaborator;
       let won;
-      if (updatedPost?.content === "win") {
+      if (updatedPost?.result === "win") {
         won = true;
       } else {
         won = false;
@@ -224,7 +273,9 @@ class Routes {
   @Router.post("/friend/requests/:to")
   async sendFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
+    console.log("here", to);
     const toId = (await User.getUserByUsername(to))._id;
+    console.log("gets here");
     return await Friend.sendRequest(user, toId);
   }
 
@@ -238,7 +289,9 @@ class Routes {
   @Router.put("/friend/accept/:from")
   async acceptFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
+    console.log("gets here checking 2", from);
     const fromId = (await User.getUserByUsername(from))._id;
+    console.log("gets here checking");
     return await Friend.acceptRequest(fromId, user);
   }
 

@@ -17,6 +17,8 @@ export default class Responses {
       return post;
     }
     const author = await User.getUserById(post.author);
+    console.log("HERE", author.username);
+    console.log("VISIBILITY", post.visibility);
     return { ...post, author: author.username };
   }
 

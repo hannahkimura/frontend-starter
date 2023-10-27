@@ -105,7 +105,7 @@ const operations: operation[] = [
 
   {
     name: "Filter Users by Preferences",
-    endpoint: "/api/users/:id",
+    endpoint: "/api/users/:_id",
     method: "POST",
     fields: { id: "input" },
   },

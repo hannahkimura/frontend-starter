@@ -28,8 +28,8 @@ onBeforeMount(async () => {
 <template>
   <header>
     <nav>
-      <div class="title">
-        <img src="@/assets/images/logo.svg" />
+      <div class="logo">
+        <img src="@/assets/images/logo.svg" alt="Athlink Logo" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Athlink</h1>
         </RouterLink>
@@ -40,7 +40,10 @@ onBeforeMount(async () => {
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
-          <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }" style="margin-right: 12px"> Profile </RouterLink>
+
+          <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
+
+          <RouterLink :to="{ name: 'Connect' }" :class="{ underline: currentRouteName == 'Connect' }"> Connect </RouterLink>
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
@@ -57,44 +60,62 @@ onBeforeMount(async () => {
 <style scoped>
 @import "./assets/toast.css";
 
+header {
+  background-color: #191d28; /* Dark background color */
+  color: #ffffff; /* White text color */
+  padding: 1em 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 nav {
-  padding: 1em 2em;
-  background-color: lightgray;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 0 2em;
 }
 
-h1 {
-  font-size: 2em;
-  margin: 0;
-}
-
-.title {
+.logo {
   display: flex;
   align-items: center;
-  gap: 0.5em;
 }
 
 img {
   height: 2em;
+  margin-right: 10px;
 }
 
-a {
-  font-size: large;
-  color: black;
-  text-decoration: none;
+h1 {
+  font-size: 1.5em;
+  margin: 0;
+  color: #ffffff;
 }
 
 ul {
   list-style-type: none;
-  margin-left: auto;
   display: flex;
-  align-items: center;
-  flex-direction: row;
   gap: 1em;
+}
+
+a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.1em;
 }
 
 .underline {
   text-decoration: underline;
+}
+
+.toast {
+  background-color: #4caf50; /* Green background color */
+  color: #ffffff; /* White text color */
+  text-align: center;
+  padding: 1em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 </style>

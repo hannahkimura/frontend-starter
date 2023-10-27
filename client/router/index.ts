@@ -2,6 +2,8 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import RegisterForm from "../components/Login/RegisterForm.vue";
+import ConnectView from "../views/ConnectView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
@@ -21,6 +23,17 @@ const router = createRouter({
       name: "Settings",
       component: SettingView,
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/connect",
+      name: "Connect",
+      component: ConnectView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/register",
+      name: "Register",
+      component: RegisterForm,
     },
     {
       path: "/login",

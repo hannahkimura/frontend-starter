@@ -9,18 +9,20 @@ export interface UserDoc extends BaseDoc {
 
 export interface UserProfileDoc extends BaseDoc {
   gender: string;
-  sports: Map<string, boolean>;
+  sports: Array<string>;
   skill: number;
   location: string;
   username: string;
+  goal: string;
 }
 
 export interface UserPrefDoc extends BaseDoc {
   username: string;
   genderPref: string;
-  sportsPref: Map<string, boolean>;
+  sportsPref: Array<string>;
   skillPref: Array<number>;
   locationRange: number;
+  goal: string;
 }
 
 export default class UserConcept {
@@ -32,19 +34,19 @@ export default class UserConcept {
     username: string,
     password: string,
     gender: string,
-    sports: Map<string, boolean>,
+    sports: Array<string>,
     skill: number,
     location: string,
     genderPref: string,
-    sportsPref: Map<string, boolean>,
+    sportsPref: Array<string>,
     skillPref: Array<number>,
     locationRange: number,
+    goal: string,
   ) {
     await this.canCreate(username, password);
-    console.log("I'm here");
     const _id = await this.users.createOne({ username, password });
-    const _pref = await this.userPreferences.createOne({ username, genderPref, sportsPref, skillPref, locationRange });
-    const _prof = await this.userProfiles.createOne({ username, gender, sports, skill, location });
+    const _pref = await this.userPreferences.createOne({ username, genderPref, sportsPref, skillPref, locationRange, goal });
+    const _prof = await this.userProfiles.createOne({ username, gender, sports, skill, location, goal });
     return {
       msg: "User created successfully!",
       user: await this.users.readOne({ _id }),
@@ -53,8 +55,9 @@ export default class UserConcept {
     };
   }
 
-  async getUserPreferencesByUsername(user: ObjectId) {
-    const preferences = await this.userPreferences.readOne({ user });
+  async getUserPreferencesByUsername(username: string) {
+    const preferences = await this.userPreferences.readOne({ username: username });
+
     if (preferences === null) {
       throw new NotFoundError(`User preferences not found!`);
     }
@@ -126,7 +129,7 @@ export default class UserConcept {
   }
 
   async filterUsers(query: Filter<UserProfileDoc>) {
-    const usersFiltered = this.userProfiles.readMany(query, {
+    const usersFiltered = await this.userProfiles.readMany(query, {
       sort: { dateUpdated: -1 },
     });
     return usersFiltered;

@@ -51,6 +51,7 @@
     "moment": "^2.29.4",
     "mongodb": "^5.7.0",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "pinia": "^2.1.6",
     "pinia-plugin-persistedstate": "^3.2.0",
     "purecss": "^3.0.0",

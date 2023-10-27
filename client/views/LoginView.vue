@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import LoginForm from "@/components/Login/LoginForm.vue";
-import RegisterForm from "@/components/Login/RegisterForm.vue";
+import { RouterLink } from "vue-router";
 </script>
 
 <template>
   <main class="column">
-    <h1>Please login or register!</h1>
+    <h1>Login here!</h1>
     <LoginForm />
-    <RegisterForm />
+    <p>Still need to create an account? <RouterLink :to="{ name: 'Register' }">Register here</RouterLink></p>
   </main>
 </template>

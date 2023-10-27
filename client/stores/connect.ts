@@ -1,23 +1,28 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-
 import { BodyT, fetchy } from "@/utils/fetchy";
+import { defineStore } from "pinia";
+import { ref } from "vue";
+const emit = defineEmits(["refreshMatchingUsers"]);
 
-export const useUserStore = defineStore(
+export const useConnectStore = defineStore(
   "user",
   () => {
-    const currentUsername = ref("");
-    const currGenderPref = ref([""]);
-    const currSportsPref = ref([]);
-    const currSkillPrefRange = ref([]);
-
-    const isLoggedIn = computed(() => currentUsername.value !== "");
+    const usernameBeingRequested = ref("");
+    const usernameRequesting = ref("");
 
     const resetStore = () => {
-      currentUsername.value = "";
-      currGenderPref.value = [];
-      currSportsPref.value = [];
-      currSkillPrefRange.value = [];
+      usernameBeingRequested.value = "";
+      usernameRequesting.value = "";
+    };
+
+    const sendRequest = async (to: string) => {
+      try {
+        await fetchy("/api/friend/requests/:to", "POST", {
+          body: { to },
+        });
+      } catch {
+        return;
+      }
+      emit("refreshMatchingUsers");
     };
 
     const createUser = async (
@@ -31,10 +36,9 @@ export const useUserStore = defineStore(
       skillPrefRange: Array<number>,
       location: string,
       maxLocationDistance: number,
-      goal: string,
     ) => {
       await fetchy("/api/users", "POST", {
-        body: { username, password, genderPref, gender, sportsPref, sports, skill, skillPrefRange, location, maxLocationDistance, goal },
+        body: { username, password, genderPref, gender, sportsPref, sports, skill, skillPrefRange, location, maxLocationDistance },
       });
     };
 
@@ -45,7 +49,6 @@ export const useUserStore = defineStore(
     };
 
     const loginUser = async (username: string, password: string) => {
-      console.log("HERE", username, password);
       await fetchy("/api/login", "POST", {
         body: { username, password },
       });
