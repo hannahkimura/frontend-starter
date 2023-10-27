@@ -12,7 +12,7 @@ void updateSession();
 <template>
   <main>
     <section>
-      <h1 v-if="isLoggedIn">Connect With Other Athletes! <ConnectForm /></h1>
+      <h1 v-if="isLoggedIn">Find Athletes That Match Your Preferences! <ConnectForm /></h1>
       <h1 v-else>Please login!</h1>
     </section>
   </main>
@@ -21,5 +21,6 @@ void updateSession();
 <style scoped>
 h1 {
   text-align: center;
+  font-family: "VTF Redzone Classic ";
 }
 </style>

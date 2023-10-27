@@ -13,12 +13,13 @@ const emit = defineEmits(["refreshPosts"]);
 const createPost = async () => {
   try {
     await fetchy("/api/posts", "POST", {
-      body: { content: content.value, result: result.value, collaborator: otherUser.value, image: image.value, visibility: visibility.value },
+      body: { content: content.value, result: result.value, collaborator: otherUser.value, visibility: visibility.value },
     });
+    emit("refreshPosts");
   } catch (_) {
     return;
   }
-  emit("refreshPosts");
+
   emptyForm();
 };
 
@@ -26,7 +27,6 @@ const emptyForm = () => {
   content.value = "";
   result.value = "";
   otherUser.value = "";
-  image.value = null;
   visibility.value = "";
 };
 </script>
@@ -39,16 +39,12 @@ const emptyForm = () => {
       <option value="lose">Lose</option>
     </select>
 
-    <label for="otherUser">Another User:</label>
+    <label for="otherUser">Opponent/Workout Buddy Username:</label>
     <input type="text" id="anotherUser" v-model="otherUser" placeholder="Add your opponent" />
-    <label for="content">Post Contents:</label>
-
-    <label for="image">Image:</label>
 
     <label for="visibility">Visibility:</label>
     <select id="visibility" v-model="visibility">
-      <option value="public">Public</option>
-      <option value="private">Private</option>
+      <option value="private">Private (Only you can see this)</option>
       <option value="friends">Friends</option>
     </select>
 

@@ -14,12 +14,26 @@ const minSkillPref = ref(0);
 const maxSkillPref = ref(5);
 const skill = ref(0); //skill score starts at 0
 const location = ref("");
+const phoneNum = ref("");
 const maxLocationDistance = ref(1000); //max number of miles willing to travel
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
   const skillPrefRange = [minSkillPref.value, maxSkillPref.value]; //store the range
-  await createUser(username.value, password.value, genderPref.value, gender.value, sportsPref.value, sports.value, skill.value, skillPrefRange, location.value, maxLocationDistance.value, goal.value);
+  await createUser(
+    username.value,
+    password.value,
+    genderPref.value,
+    gender.value,
+    sportsPref.value,
+    sports.value,
+    skill.value,
+    skillPrefRange,
+    location.value,
+    maxLocationDistance.value,
+    goal.value,
+    phoneNum.value,
+  );
   await loginUser(username.value, password.value);
   void updateSession();
   void router.push({ name: "Home" });
@@ -72,6 +86,27 @@ async function register() {
             </div>
           </div>
         </div>
+        <div>
+          <h3 for="sports">Sports You Play</h3>
+          <div class="checkbox-container">
+            <div>
+              <input type="checkbox" value="basketball" v-model="sports" id="sportsBasketball" />
+              <label for="sportsBasketball">Basketball</label>
+            </div>
+            <div>
+              <input type="checkbox" value="tennis" v-model="sports" id="sportsTennis" />
+              <label for="sportsTennis">Tennis</label>
+            </div>
+            <div>
+              <input type="checkbox" value="volleyball" v-model="sports" id="sportsVolleyball" />
+              <label for="sportsVolleyball">Volleyball</label>
+            </div>
+            <div>
+              <input type="checkbox" value="running" v-model="sports" id="sportsRunning" />
+              <label for="sportsRunning">Running</label>
+            </div>
+          </div>
+        </div>
 
         <div>
           <h3 for="goal">Goals</h3>
@@ -90,6 +125,11 @@ async function register() {
         <div>
           <h3 for="location">Current location</h3>
           <input type="text" id="location" v-model.trim="location" placeholder="Current Location" required />
+        </div>
+
+        <div>
+          <h3 for="phoneNum">Phone Number</h3>
+          <input type="text" id="phoneNum" v-model.trim="phoneNum" placeholder="Phone Number" required />
         </div>
 
         <div>

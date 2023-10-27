@@ -10,6 +10,10 @@ export const useUserStore = defineStore(
     const currGenderPref = ref([""]);
     const currSportsPref = ref([]);
     const currSkillPrefRange = ref([]);
+    const currGender = ref("");
+    const currSports = ref([""]);
+    const currSkill = ref("");
+    const currPhone = ref("");
 
     const isLoggedIn = computed(() => currentUsername.value !== "");
 
@@ -18,6 +22,10 @@ export const useUserStore = defineStore(
       currGenderPref.value = [];
       currSportsPref.value = [];
       currSkillPrefRange.value = [];
+      currGender.value = "";
+      currSports.value = [];
+      currSkill.value = "";
+      currPhone.value = "";
     };
 
     const createUser = async (
@@ -28,19 +36,32 @@ export const useUserStore = defineStore(
       sportsPref: Array<string>,
       sports: Array<string>,
       skill: number,
-      skillPrefRange: Array<number>,
+      skillPref: Array<number>,
       location: string,
-      maxLocationDistance: number,
+      locationRange: number,
       goal: string,
+      phoneNum: string,
     ) => {
       await fetchy("/api/users", "POST", {
-        body: { username, password, genderPref, gender, sportsPref, sports, skill, skillPrefRange, location, maxLocationDistance, goal },
+        body: { username, password, genderPref, gender, sportsPref, sports, skill, skillPref, location, locationRange, goal, phoneNum },
       });
     };
 
-    const getUserMatches = async (genderPref: string, sportsPref: Array<string>, skillPrefRange: Array<number>) => {
+    const getuserProfile = async () => {
+      return await fetchy(`/api/users/profile/${currentUsername.value}`, "GET");
+      // currGender.value = "";
+      // currSports.value = [];
+      // currSkill.value = "";
+      // currPhone.value = "";
+      // currGender.value = profile.gender;
+      // currSports.value = profile.sports;
+      // currSkill.value= profile.skill;
+      // currPhone.value=
+    };
+
+    const getUserMatches = async (genderPref: string, sportsPref: Array<string>, skillPref: Array<number>, goal: string) => {
       return await fetchy("api/users/:_id", "POST", {
-        body: { genderPref, sportsPref, skillPrefRange },
+        body: { genderPref, sportsPref, skillPref, goal },
       });
     };
 
@@ -90,11 +111,8 @@ export const useUserStore = defineStore(
       updateUser,
       deleteUser,
       getUserMatches,
+      getuserProfile,
     };
   },
   { persist: true },
 );
-
-// new page
-// similar to post list component
-//write backend

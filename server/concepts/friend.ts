@@ -107,6 +107,19 @@ export default class FriendConcept {
     return false;
   }
 
+  async friendRequestExists(u1: ObjectId, u2: ObjectId) {
+    // check if there is pending request between these users
+    const request = await this.requests.readOne({
+      from: { $in: [u1, u2] },
+      to: { $in: [u1, u2] },
+      status: "pending",
+    });
+    if (request !== null) {
+      return true;
+    }
+    return false;
+  }
+
   private async canSendRequest(u1: ObjectId, u2: ObjectId) {
     await this.isNotFriends(u1, u2);
     // check if there is pending request between these users

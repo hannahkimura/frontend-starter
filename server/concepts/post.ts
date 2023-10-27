@@ -3,16 +3,10 @@ import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
 
-export interface PostOptions {
-  backgroundColor?: string;
-}
-
 export interface PostDoc extends BaseDoc {
   author: ObjectId;
   content: string;
   result: string;
-  image?: string;
-  options?: PostOptions;
   visibility?: string;
   collaborator?: string; //if you want to collaborate with another user
 }
@@ -22,11 +16,11 @@ export interface PostDoc extends BaseDoc {
 export default class PostConcept {
   public readonly posts = new DocCollection<PostDoc>("posts");
 
-  async create(result: string, author: ObjectId, content: string, image?: string, options?: PostOptions, collaborator?: string, visibility?: string) {
+  async create(result: string, author: ObjectId, content: string, collaborator?: string, visibility?: string) {
     if (visibility === undefined) {
       visibility = "public";
     }
-    const _id = await this.posts.createOne({ result, author, content, image, options, collaborator, visibility });
+    const _id = await this.posts.createOne({ result, author, content, collaborator, visibility });
     return { msg: "Post successfully created!", post: await this.posts.readOne({ _id }) };
   }
 

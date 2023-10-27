@@ -14,6 +14,7 @@ export interface UserProfileDoc extends BaseDoc {
   location: string;
   username: string;
   goal: string;
+  phoneNum: string;
 }
 
 export interface UserPrefDoc extends BaseDoc {
@@ -42,11 +43,13 @@ export default class UserConcept {
     skillPref: Array<number>,
     locationRange: number,
     goal: string,
+    phoneNum: string,
   ) {
     await this.canCreate(username, password);
     const _id = await this.users.createOne({ username, password });
     const _pref = await this.userPreferences.createOne({ username, genderPref, sportsPref, skillPref, locationRange, goal });
-    const _prof = await this.userProfiles.createOne({ username, gender, sports, skill, location, goal });
+    console.log("PREF", _pref);
+    const _prof = await this.userProfiles.createOne({ username, gender, sports, skill, location, goal, phoneNum });
     return {
       msg: "User created successfully!",
       user: await this.users.readOne({ _id }),
@@ -71,8 +74,8 @@ export default class UserConcept {
     await this.userPreferences.updateOne({ _id }, update);
   }
 
-  async getUserProfileByUsername(user: ObjectId) {
-    const profile = await this.userProfiles.readOne({ user });
+  async getUserProfileByUsername(username: string) {
+    const profile = await this.userProfiles.readOne({ username: username });
     if (profile === null) {
       throw new NotFoundError(`User profile not found!`);
     }

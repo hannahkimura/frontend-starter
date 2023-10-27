@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { Friend, Post, SkillScore, User, WebSession } from "./app";
-import { PostDoc, PostOptions } from "./concepts/post";
+import { PostDoc } from "./concepts/post";
 import { UserDoc, UserPrefDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -26,6 +26,18 @@ class Routes {
     return await User.getUserByUsername(username);
   }
 
+  @Router.get("/users/profile/:profile") async getProfile(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const username = await User.idsToUsernames([user]);
+    const newUsername: string = username[0];
+    return await User.getUserProfileByUsername(newUsername);
+  }
+
+  @Router.get("/users/profileUnique/:username") async getUniqueProfile(username: string) {
+    console.log(username);
+    return await User.getUserProfileByUsername(username);
+  }
+
   @Router.post("/users")
   async createUser(
     session: WebSessionDoc,
@@ -40,14 +52,14 @@ class Routes {
     skillPref: Array<number>,
     locationRange: number,
     goal: string,
+    phoneNum: string,
   ) {
     WebSession.isLoggedOut(session);
-    const finished = await User.create(username, password, gender, sports, skill, location, genderPref, sportsPref, skillPref, locationRange, goal);
+    const finished = await User.create(username, password, gender, sports, skill, location, genderPref, sportsPref, skillPref, locationRange, goal, phoneNum);
     const userId = finished.user?._id;
     if (userId) {
       await SkillScore.createScore(userId, 1);
     }
-    console.log("FINISHED", finished, finished.profile);
     const profile = await Responses.profile(finished.profile);
     return { user: { username, password }, profile: profile, preferences: await Responses.preferences(finished.preference) };
   }
@@ -80,7 +92,7 @@ class Routes {
     const userPref = await User.getUserPreferencesByUsername(newUsername);
 
     const genderPref = userPref.genderPref;
-    console.log(genderPref);
+    console.log("PREFERENCES", userPref);
     const skillPref = userPref.skillPref;
     //const locationRange = userPref.locationRange;
     const sportPref = userPref.sportsPref;
@@ -93,7 +105,7 @@ class Routes {
     //a user having any of those sports would match
     // I want to filter for sports but I don't know how because it is an array (also skillPref)
     //return { msg: "Filtered Users!", users: await User.filterUsers({ genderPref, skillPref, sportPref }) };
-    console.log("ACTUAL", await User.filterUsers({ gender: genderPref }));
+    // console.log("ACTUAL", await User.filterUsers({ gender: genderPref }));
     let matches = await User.filterUsers({ gender: genderPref });
 
     // matches.filter(function (user) {
@@ -104,6 +116,7 @@ class Routes {
     //   }
     // });
     matches = matches.filter((userTest) => userTest.username !== newUsername);
+    // console.log("GOT HERE", matches);
 
     for (const possibleMatch of matches) {
       let sportsMatch = false;
@@ -114,17 +127,26 @@ class Routes {
           break;
         }
       }
+
       for (let i = skillPref[0]; i < skillPref[1] + 1; i++) {
-        if (i === possibleMatch.skill) {
+        if (i == possibleMatch.skill) {
           skillMatch = true;
         }
       }
+
       if (!sportsMatch || !skillMatch) {
         //get rid of this user
         matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
       }
+      const userIdMatch = (await User.getUserByUsername(possibleMatch.username))._id;
+      if (await Friend.areFriends(user, userIdMatch)) {
+        matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+      }
+
+      if (await Friend.friendRequestExists(user, userIdMatch)) {
+        matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+      }
     }
-    console.log("MATCHES", matches);
 
     return { msg: "Filtered Users!", users: matches };
   }
@@ -149,17 +171,15 @@ class Routes {
     const postsToReturn: Array<PostDoc> = [];
     if (author) {
       const id = (await User.getUserByUsername(author))._id;
-      console.log("ID from getpost", id);
+
       posts = await Post.getByAuthor(id);
-      console.log("Post", posts);
+
       const otherUser = WebSession.getUser(session);
       if (!otherUser) {
         throw new Error("can't find other user");
       }
-      console.log(otherUser, "here");
 
       const otherId = (await User.getUserById(otherUser))._id;
-      console.log("otherId", otherId);
 
       if (id.toString() === otherId.toString()) {
         //author is the same as user
@@ -184,20 +204,24 @@ class Routes {
     } else {
       //author doesn't exist
       posts = await Post.getPosts({});
-      return Responses.posts(posts);
+      for (const post of posts) {
+        if (post.visibility !== "private") {
+          postsToReturn.push(post);
+        }
+      }
+      return Responses.posts(postsToReturn);
       // console.log(posts);
       // console.log(await Responses.posts(postsToReturn));
     }
-    const result = await Responses.posts(postsToReturn);
-    console.log("RESULT", result);
+
     return await Responses.posts(postsToReturn);
   }
 
   @Router.post("/posts")
-  async createPost(session: WebSessionDoc, result: string, content: string, image?: string, options?: PostOptions, collaborator?: string, visibility?: string) {
+  async createPost(session: WebSessionDoc, result: string, content: string, collaborator?: string, visibility?: string) {
     const user = WebSession.getUser(session);
 
-    const created = await Post.create(result, user, content, image, options, collaborator, visibility);
+    const created = await Post.create(result, user, content, collaborator, visibility);
     if (!created.post) {
       throw new Error("post wasn't created");
     }
@@ -276,7 +300,11 @@ class Routes {
     console.log("here", to);
     const toId = (await User.getUserByUsername(to))._id;
     console.log("gets here");
-    return await Friend.sendRequest(user, toId);
+    const username = await User.idsToUsernames([user]);
+    const newUsername: string = username[0];
+    const fromInfo = User.getUserPreferencesByUsername(newUsername);
+    await Friend.sendRequest(user, toId);
+    return fromInfo;
   }
 
   @Router.delete("/friend/requests/:to")

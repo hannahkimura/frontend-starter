@@ -8,9 +8,13 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 <template>
   <main>
-    <h1>Home Page</h1>
-    <section>
-      <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
+    <section class="custom-font">
+      <h1 v-if="isLoggedIn">
+        <div>
+          <img src="@/assets/images/athletes.jpg" alt="My Image" />
+        </div>
+        Your Feed
+      </h1>
       <h1 v-else>Please login!</h1>
     </section>
     <PostListComponent />
@@ -18,6 +22,10 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </template>
 
 <style scoped>
+@import "@/assets/font.css";
+.custom-font {
+  font-family: "VTF Redzone Classic Oblique";
+}
 h1 {
   text-align: center;
 }

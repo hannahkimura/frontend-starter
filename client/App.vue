@@ -16,9 +16,6 @@ const { toast } = storeToRefs(useToastStore());
 onBeforeMount(async () => {
   try {
     await userStore.updateSession();
-    if (isLoggedIn.value) {
-      await router.push("/profile");
-    }
   } catch {
     // User is not logged in
   }
@@ -36,7 +33,9 @@ onBeforeMount(async () => {
       </div>
       <ul>
         <li>
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
+          <div class="home-feed-link">
+            <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Feed </RouterLink>
+          </div>
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
@@ -65,6 +64,7 @@ header {
   color: #ffffff; /* White text color */
   padding: 1em 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: "VTF Redzone Classic Oblique";
 }
 
 nav {
@@ -72,6 +72,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0 2em;
+  font-family: "VTF Redzone Classic Oblique";
 }
 
 .logo {
