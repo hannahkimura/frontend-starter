@@ -96,7 +96,52 @@ class Routes {
     const skillPref = userPref.skillPref;
     //const locationRange = userPref.locationRange;
     const sportPref = userPref.sportsPref;
-    console.log("OTHER USERS", await User.filterUsers({ genderPref, skillPref, sportPref }));
+    console.log("ALLLLLL USERS,", await User.getUsers());
+    // const check1 = await User.getUsers();
+    // const usernamesToDelete = [
+    //   "hkimura",
+    //   "h",
+    //   "Hannah",
+    //   "hi",
+    //   "his",
+    //   "s",
+    //   "a",
+    //   "ss",
+    //   "ssd",
+    //   "sd",
+    //   "sdf",
+    //   "hg",
+    //   "dsfdsfdf",
+    //   "x",
+    //   "pdf",
+    //   "pdfs",
+    //   "hannah",
+    //   "tennis",
+    //   "zach",
+    //   "zach1",
+    //   "hola",
+    //   "bien",
+    //   "si",
+    //   "col",
+    //   "check",
+    //   "one",
+    //   "two",
+    //   "three",
+    //   "four",
+    //   "five",
+    //   "six",
+    //   "seven",
+    //   "nine",
+    // ];
+
+    // for (const userL of check1) {
+    //   if (usernamesToDelete.includes(userL.username)) {
+    //     await User.delete(userL._id);
+    //   }
+    // }
+    console.log("AFTER", await User.getUsers());
+
+    //console.log("OTHER USERS", await User.filterUsers({ genderPref, skillPref, sportPref }));
 
     //loop thru users that match gender and then look if their sports have ur sports pref
     //const valid_users = [];
@@ -133,18 +178,23 @@ class Routes {
           skillMatch = true;
         }
       }
-
+      console.log(possibleMatch.username, sportsMatch, skillMatch);
       if (!sportsMatch || !skillMatch) {
         //get rid of this user
         matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+        console.log("HERE", matches);
       }
-      const userIdMatch = (await User.getUserByUsername(possibleMatch.username))._id;
-      if (await Friend.areFriends(user, userIdMatch)) {
-        matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
-      }
+      try {
+        const userIdMatch = (await User.getUserByUsername(possibleMatch.username))._id;
+        if (await Friend.areFriends(user, userIdMatch)) {
+          matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+        }
 
-      if (await Friend.friendRequestExists(user, userIdMatch)) {
-        matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+        if (await Friend.friendRequestExists(user, userIdMatch)) {
+          matches = matches.filter((userTest) => userTest.username !== possibleMatch.username);
+        }
+      } catch {
+        continue;
       }
     }
 
